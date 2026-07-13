@@ -1,5 +1,6 @@
 import { AudioDB } from "../db/audioDb";
 export const MAX_VOLUMN = 4;
+
 // AudioManager.ts
 export class AudioManager {
   private static sharedCtx = new AudioContext();
@@ -50,17 +51,26 @@ export class AudioManager {
   }
 
   /** Preload multiple */
-  async loadAll(sounds: Record<string, string>) {
-    await Promise.all(
-      Object.entries(sounds).map(([name, url]) => this.loadSound(name, url))
+  async loadAll(
+    sounds: Record<string, string>,
+    timeout = 2000,
+  ): Promise<boolean> {
+    const load = Promise.all(
+      Object.entries(sounds).map(([name, url]) => this.loadSound(name, url)),
+    ).then(() => true);
+
+    const timedOut = new Promise<boolean>((resolve) =>
+      setTimeout(() => resolve(false), timeout),
     );
+
+    return Promise.race([load, timedOut]);
   }
 
   /** Play simple one-shot sound */
   play(
     name: string,
     options?: { volume?: number; pitch?: number },
-    isDemo: boolean = false
+    isDemo: boolean = false,
   ) {
     const buffer = this.buffers.get(name);
     if (!buffer) return console.warn(`AudioManager: ${name} not loaded`);
@@ -99,7 +109,7 @@ export class AudioManager {
 
       this.oneShotSources.set(
         name,
-        list.filter((s) => s !== source)
+        list.filter((s) => s !== source),
       );
 
       source.disconnect();
@@ -130,21 +140,20 @@ export class AudioManager {
     // Fade in
     gain.gain.linearRampToValueAtTime(
       volume,
-      this.audioContext.currentTime + fadeMs / 1000
+      this.audioContext.currentTime + fadeMs / 1000,
     );
   }
 
   setLoopVolume(name: string, volume: number) {
-  const loop = this.loopSources.get(name);
-  if (!loop) return;
+    const loop = this.loopSources.get(name);
+    if (!loop) return;
 
-  loop.gain.gain.setTargetAtTime(
-    volume,
-    this.audioContext.currentTime,
-    0.05 // smooth fade, no clicks
-  );
-}
-
+    loop.gain.gain.setTargetAtTime(
+      volume,
+      this.audioContext.currentTime,
+      0.05, // smooth fade, no clicks
+    );
+  }
 
   /** ⏹ Stop loop (with fade out) */
   stopLoop(name: string, fadeMs = 200) {
@@ -185,7 +194,7 @@ export class AudioManager {
   setMasterVolume(volume: number) {
     this.masterGain.gain.linearRampToValueAtTime(
       volume,
-      this.audioContext.currentTime + 0.2
+      this.audioContext.currentTime + 0.2,
     );
   }
 

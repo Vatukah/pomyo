@@ -6,29 +6,16 @@ import ModelGroup from "./components/canvas/modelGroup";
 import ActionToolWrapper from "./components/ActionToolWrapper";
 import TodoPanel from "./components/panel/todoPanel";
 
-import { useEffect } from "react";
-
 import SyncTimerTotitle from "./components/SyncTimerToTitle";
 import { PomyoLoader } from "./components/PomyoLoader";
 
-
-
-
 function App() {
-  const isBooted  = useBootStore(s=>s.isBooted);
-  const ready  = useBootStore(s=>s.readySet);
+  const isBooted = useBootStore((s) => s.isBooted);
 
-  useEffect(()=>{
-  for (const value of ready) {
-  console.log(value);
-}
-  },[ready])
-
-  
-  if (!isBooted) return <PomyoLoader/>;
+  if (!isBooted) return <PomyoLoader />;
   return (
     <>
-    <SyncTimerTotitle/>
+      <SyncTimerTotitle />
       <main className="main-container">
         <BigDigit />
         <CanvasContainer>
@@ -36,11 +23,10 @@ function App() {
             <Model key={"tomato-modal"} />
           </ModelGroup>
         </CanvasContainer>
-       
+
         <ActionToolWrapper />
 
         <TodoPanel />
-       
       </main>
     </>
   );

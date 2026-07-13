@@ -1,0 +1,5 @@
+Skills
+• ReactJS, JavaScript (ES6+), HTML5, CSS3
+• State Management (Context API), React Hooks, Component Architecture
+• Responsive Design, UI/UX Principles
+• Git, GitHub, Vite
